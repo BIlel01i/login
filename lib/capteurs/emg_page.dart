@@ -1,156 +1,187 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: library_private_types_in_public_api, avoid_print
 
-// Glycemie page include an image, a title, a description, and extra content.
-class EmgPage extends StatefulWidget  {
+import 'package:flutter/material.dart';
+import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
+
+class EmgPage extends StatefulWidget {
   const EmgPage({super.key});
 
   @override
-  _EmgPagestate createState() => _EmgPagestate();
+  _EmgPageState createState() => _EmgPageState();
 }
 
-class _EmgPagestate extends State<EmgPage> {
+class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<int> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true); // This makes the animation go back and forth
+
+    _animation = IntTween(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      body: Container(
-        decoration: BoxDecoration(
-          image:DecorationImage(
-            image: AssetImage('lib/images/background.png'),
-            fit:BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 30,
-              left:20, 
-              child: Padding(
-                padding: const EdgeInsets.all (8.0),
-                child: Image.asset(
-                  'lib/images/logotaw.png',
-                  width :130, 
-                  height :60, 
-        
-                ),
+      drawer: const NavBar(), // Your navigation drawer
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('lib/images/background.png'),
+                fit: BoxFit.cover,
               ),
             ),
-            Positioned(
-              top: 120, // Adjust top position as needed
-              left: 30, // Adjust left position as needed
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'EMG',
-                    style: TextStyle(
-                      color: Colors.blue, // Change text color as needed
-                      fontSize: 25, // Adjust font size as needed
-                      fontWeight: FontWeight.bold, // Adjust font weight as needed
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Image.asset(
+                        "lib/images/logotaw.png",
+                        width: 100,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                  ),
-                 
-                  
-                      
-                ],
-              ),
-            ),
-            
-            Positioned(
-                bottom: 10,
-                right: 20,
-                child: Image.asset(
-                  'lib/images/Mode_Isolation.png', // Replace with your image asset
-                  width: 100, // Adjust image width as needed
-                  height: 100, // Adjust image height as needed
+                  ],
                 ),
-            ),
-            Positioned(
-                top: 190,
-                left: 70,
-                child: Image.asset(
-                  'lib/images/emg1.png', // Replace with your image asset
-                  width: 170, // Adjust image width as needed
-                  height: 170, // Adjust image height as needed
+                Expanded(
+                  child: orientationLayout(),
                 ),
-            ),
-            Positioned(
-                bottom: 170,
-                left: 70 ,
-                child: Image.asset(
-                  'lib/images/spo2im2.png', // Replace with your image asset
-                  width: 180, // Adjust image width as needed
-                  height: 180, // Adjust image height as needed
-                ),
-            ),
-            
-            Positioned(
-              bottom:235,
-              left:100, 
-              child: Text(
-                'Video',
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Colors.black,
-                  fontSize: 40,
-                  
-                ),
-              ),
-            ),
-            Positioned(
-            bottom: 150,
-            left: 35,
-            child: Row(
-              children: [
-                _buildButton( 'Start',Colors.blue,  () {
-                  // Add functionality for button 1
-                  print('start pressed');
-                }),
-                SizedBox(width: 20),
-                _buildButton( 'Reset',Colors.blue ,() {
-                  // Add functionality for button 2
-                  print('Reset pressed');
-                }),
-                
-               
               ],
             ),
           ),
-          Positioned(
-            bottom: 100,
-            left: 35,
-            child: Row(
-              children: [
-                _buildButton( 'Upload',Colors.blue,  () {
-                  // Add functionality for button 1
-                  print('Upload pressed');
-                }),
-                SizedBox(width: 20),
-                _buildButton( 'Archive',Colors.blue ,() {
-                  // Add functionality for button 2
-                  print('Archive pressed');
-                }),
-                
-               
-              ],
-            ),
-          ),
-          ],
-        
-        ),
+        ],
       ),
-      
     );
-
   }
-  Widget _buildButton(String text,Color color ,  VoidCallback onPressed) {
+
+  Widget orientationLayout() {
+    var orientation = MediaQuery.of(context).orientation;
+    return orientation == Orientation.portrait
+        ? portraitLayout()
+        : landscapeLayout();
+  }
+
+  Widget portraitLayout() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 30, top: 40),
+                child: Text(
+                  'EMG',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (_, __) => Image.asset(
+                  _animation.value == 0
+                      ? 'lib/images/icon1.png'
+                      : 'lib/images/icon2.png',
+                  width: 50,
+                  height: 50,
+                ),
+              ),
+            ],
+          ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 100),
+              child: Image.asset(
+                'lib/images/emg1.png',
+                width: 150,
+                height: 150,
+              ),
+            ),
+          ),
+          buttonsRow(),
+          Center(
+            child: Image.asset(
+              'lib/images/Mode_Isolation.png',
+              width: 100,
+              height: 100,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget landscapeLayout() {
+    return const Center(
+      child: Text("Landscape mode - Show real-time chart here"),
+    );
+  }
+
+  Widget buttonsRow() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('Start', Colors.blue, () {}),
+              _buildButton('Reset', Colors.blue, () {}),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('Upload', Colors.blue, () {
+                print('Upload pressed');
+              }),
+              _buildButton('Archive', Colors.blue, () {
+                print('Archive pressed');
+              }),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButton(String text, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: color, 
-        minimumSize: Size(120, 40),// Set button color
+        backgroundColor: color,
+        minimumSize: const Size(120, 40),
       ),
-      
       child: Text(text),
     );
   }

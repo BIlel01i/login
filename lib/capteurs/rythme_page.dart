@@ -1,176 +1,144 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: avoid_print, library_private_types_in_public_api
 
-// Glycemie page include an image, a title, a description, and extra content.
-class RythmePage extends StatefulWidget  {
+import 'package:flutter/material.dart';
+import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
+
+class RythmePage extends StatefulWidget {
   const RythmePage({super.key});
 
   @override
-  _RythmePagestate createState() => _RythmePagestate();
+  _RythmePageState createState() => _RythmePageState();
 }
 
-class _RythmePagestate extends State<RythmePage> {
+class _RythmePageState extends State<RythmePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      body: Container(
-        decoration: BoxDecoration(
-          image:DecorationImage(
-            image: AssetImage('lib/images/background.png'),
-            fit:BoxFit.cover,
+      drawer: const NavBar(), // Your navigation drawer
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('lib/images/background.png'),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 30,
-              left:20, 
-              child: Padding(
-                padding: const EdgeInsets.all (8.0),
-                child: Image.asset(
-                  'lib/images/logotaw.png',
-                  width :130, 
-                  height :60, 
-        
-                ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20),
+            child: Image.asset(
+              "lib/images/logotaw.png",
+              width: 100,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('lib/images/background.png'),
+                fit: BoxFit.cover,
               ),
             ),
-            Positioned(
-              top: 120, // Adjust top position as needed
-              left: 5, // Adjust left position as needed
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Rythme cardiaque',
+          ),
+          SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 50),
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20),
+                  child: Text(
+                    'Heart Rate',
                     style: TextStyle(
-                      color: Colors.blue, // Change text color as needed
-                      fontSize: 20, // Adjust font size as needed
-                      fontWeight: FontWeight.bold, // Adjust font weight as needed
+                      color: Colors.blue,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                 
-                  
-                      
-                ],
-              ),
-            ),
-            Positioned(
-                top: 90,
-                right: 6,
-                child: Image.asset(
-                  'lib/images/temp3.png', // Replace with your image asset
-                  width: 120, // Adjust image width as needed
-                  height: 120, // Adjust image height as needed
                 ),
-            ),
-            Positioned(
-              top:130,
-              right:25, 
-              child: Text(
-                'BPM',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight:FontWeight.bold,
+                const SizedBox(height: 40),
+                Center(
+                  child: Stack(
+                    alignment: Alignment
+                        .center, // This will center the 'BPM' text over the image
+                    children: [
+                      Image.asset(
+                        'lib/images/temp3.png',
+                        width: 180,
+                        height: 180,
+                      ),
+                      const Text(
+                        'BPM',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-            Positioned(
-                bottom: 10,
-                right: 20,
-                child: Image.asset(
-                  'lib/images/Mode_Isolation.png', // Replace with your image asset
-                  width: 100, // Adjust image width as needed
-                  height: 100, // Adjust image height as needed
+                const SizedBox(height: 20),
+                Center(
+                  child: Image.asset(
+                    'lib/images/rythme.png',
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
-            ),
-            Positioned(
-                top: 190,
-                left: 50,
-                child: Image.asset(
-                  'lib/images/rythme.png', // Replace with your image asset
-                  width: 200, // Adjust image width as needed
-                  height: 200, // Adjust image height as needed
+                const SizedBox(height: 20),
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildButton('Start', Colors.blue, () {
+                        print('Start pressed');
+                      }),
+                      const SizedBox(width: 30),
+                      _buildButton('Reset', Colors.blue, () {
+                        print('Reset pressed');
+                      }),
+                    ],
+                  ),
                 ),
-            ),
-            Positioned(
-                bottom: 170,
-                left: 70 ,
-                child: Image.asset(
-                  'lib/images/spo2im2.png', // Replace with your image asset
-                  width: 180, // Adjust image width as needed
-                  height: 180, // Adjust image height as needed
+                const SizedBox(height: 20),
+                Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildButton('Upload', Colors.blue, () {
+                        print('Upload pressed');
+                      }),
+                      const SizedBox(width: 30),
+                      _buildButton('Archive', Colors.blue, () {
+                        print('Archive pressed');
+                      }),
+                    ],
+                  ),
                 ),
-            ),
-            
-            Positioned(
-              bottom:235,
-              left:100, 
-              child: Text(
-                'Video',
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Colors.black,
-                  fontSize: 40,
-                  
-                ),
-              ),
-            ),
-            Positioned(
-            bottom: 150,
-            left: 35,
-            child: Row(
-              children: [
-                _buildButton( 'Start',Colors.blue,  () {
-                  // Add functionality for button 1
-                  print('start pressed');
-                }),
-                SizedBox(width: 20),
-                _buildButton( 'Reset',Colors.blue ,() {
-                  // Add functionality for button 2
-                  print('Reset pressed');
-                }),
-                
-               
               ],
             ),
           ),
-          Positioned(
-            bottom: 100,
-            left: 35,
-            child: Row(
-              children: [
-                _buildButton( 'Upload',Colors.blue,  () {
-                  // Add functionality for button 1
-                  print('Upload pressed');
-                }),
-                SizedBox(width: 20),
-                _buildButton( 'Archive',Colors.blue ,() {
-                  // Add functionality for button 2
-                  print('Archive pressed');
-                }),
-                
-               
-              ],
-            ),
-          ),
-          ],
-        
-        ),
+        ],
       ),
-      
     );
-
   }
-  Widget _buildButton(String text,Color color ,  VoidCallback onPressed) {
+
+  Widget _buildButton(String text, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: color, 
-        minimumSize: Size(120, 40),// Set button color
+        backgroundColor: color,
+        minimumSize: const Size(120, 40), // Set button size
       ),
-      
       child: Text(text),
     );
   }
