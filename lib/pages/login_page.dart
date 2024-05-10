@@ -2,8 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tawhida_login/components/my_button.dart';
 import 'package:tawhida_login/components/my_textfield.dart';
-import 'package:tawhida_login/components/square_title.dart';
-import 'package:tawhida_login/pages/register_page.dart';    
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -36,11 +34,11 @@ class _LoginPageState extends State<LoginPage> {
         password: passwordController.text,
       );
       Navigator.pop(context);
-    }on FirebaseAuthException catch (e){
+    } on FirebaseAuthException catch (e){
       Navigator.pop(context);
       //wrong email 
-      if (e.code=='user-not-found'){
-        //show error to user 
+      if (e.code =='user-not-found'){
+        print('no user found for that email '); 
         wrongEmailMessage(); 
 
       } else if (e.code == 'wrong-password'){
@@ -57,7 +55,14 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context){
         return const AlertDialog(
-          title: Text('Incorrect Email '),
+          backgroundColor: Colors.blue,
+          title:Center(
+            child:Text(
+              'Incorrect Email',
+              style: TextStyle(color:Colors.red),
+              ),
+          ),
+          
         );
       }
     );
@@ -67,7 +72,14 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       builder: (context){
         return const AlertDialog(
-          title: Text('Incorrect Password '),
+           backgroundColor: Colors.blue,
+          title:Center(
+            child:Text(
+              'Incorrect Password',
+              style: TextStyle(color:Colors.red),
+              ),
+          ),
+          
         );
       }
     );
@@ -108,23 +120,17 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                   ),
               
-                  const SizedBox(height: 30),
+                  
               
                   // welcome back, you've been missed!
-                  Text(
-                    'Welcome back you\'ve been missed!',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
-                    ),
-                  ),
+                  
               
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 10),
               
                   // username textfield
                   MyTextField(
                     controller: emailController,
-                    hintText: 'Username',
+                    hintText: 'Username@example.com',
                     obscureText: false,
                   ),
               
@@ -161,52 +167,12 @@ class _LoginPageState extends State<LoginPage> {
                     onTap: signUserIn,
                   ),
               
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 10),
               
-                  // or continue with
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: Text(
-                            'Or continue with',
-                            style: TextStyle(color: Colors.grey[700]),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            thickness: 0.5,
-                            color: Colors.grey[400],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  
               
-                  const SizedBox(height: 50),
-              
-                  // google + apple sign in buttons
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children:  [
-                      // google button
-                      SquareTile(imagePath: 'lib/images/google.png'),
-              
-                      
-              
-                      
-                    ],
-                  ),
-              
-                  const SizedBox(height: 50),
+                 
+                  const SizedBox(height: 25),
               
                   // not a member? register now
                   Row(
@@ -218,18 +184,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(width: 4),
                       GestureDetector(
-                        //onTap: widget.onTap ,
-                        onTap: (){print('heree');
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder:(context)=>RegisterPage(onTap: null),
-                          ),
-
-
-                        );},
+                        onTap: widget.onTap ,
                         child: const Text(
                           'Register now',
-                          style: TextStyle(
+                            style: TextStyle(
                             color: Colors.blue,
                             fontWeight: FontWeight.bold,
                           ),

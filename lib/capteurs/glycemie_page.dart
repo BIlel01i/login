@@ -42,21 +42,14 @@ class _GlycemiePageState extends State<GlycemiePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    'Temperature',
+                    'Glycemie',
                     style: TextStyle(
                       color: Colors.blue, // Change text color as needed
                       fontSize: 16, // Adjust font size as needed
                       fontWeight: FontWeight.bold, // Adjust font weight as needed
                     ),
                   ),
-                  Text(
-                    'corporelle',
-                    style: TextStyle(
-                      color: Colors.blue, // Change text color as needed
-                      fontSize: 16, // Adjust font size as needed
-                      fontWeight: FontWeight.bold, // Adjust font weight as needed
-                    ),
-                  ),
+                 
                   
                       
                 ],
@@ -75,7 +68,7 @@ class _GlycemiePageState extends State<GlycemiePage> {
               top:230,
               left:160, 
               child: Text(
-                '°C',
+                'mg',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,

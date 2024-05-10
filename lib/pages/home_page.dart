@@ -6,8 +6,7 @@ import 'package:tawhida_login/capteurs/glycemie_page.dart';
 import 'package:tawhida_login/capteurs/rythme_page.dart';
 import 'package:tawhida_login/capteurs/spo2_page.dart';
 import 'package:tawhida_login/capteurs/temperture_page.dart';
-import 'package:tawhida_login/pages/login_page.dart';
-//import 'package:tawhida_login/nav_bar.dart';
+import 'package:tawhida_login/nav_bar.dart';
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
   void signUserOut(){
@@ -17,26 +16,18 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          //drawer: NavBar(),
+          drawer: NavBar(),
           
           appBar: AppBar(
             
-       leading: Center(
-         child: ElevatedButton(
-            onPressed: () {
-              // Action à effectuer lorsque le bouton est pressé
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const LoginPage(onTap:null,)));
-            },
-            child: const Text('Se connecter'),
-          ),
-        ),
+      
           
             backgroundColor: Colors.transparent,
             elevation: 0,
             actions: [
+              /*IconButton(onPressed: signUserOut,icon:Icon(Icons.logout)),
+              const SizedBox(width:10),*/
+
               
               Image.asset(
                 "lib/images/logotaw.png",
@@ -323,7 +314,8 @@ class HomePage extends StatelessWidget {
                               InkWell(
                                 onTap: () {
                                   Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) => const TemperaturePage ()));
+                                      MaterialPageRoute(builder: (context) =>const  TemperaturePage (userId: "RpJP0eVgJrOiAZm1pgVyoRGvwY13"),
+                                      ));
                                 },
                                 child: Container(
                                   height: 116,

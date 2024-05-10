@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tawhida_login/components/my_button.dart';
-import 'package:tawhida_login/components/my_textfield.dart';
-import 'package:tawhida_login/components/square_title.dart';    
+import 'package:tawhida_login/components/my_textfield.dart';    
 
 class RegisterPage extends StatefulWidget {
   final Function()? onTap;
@@ -81,22 +80,38 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SafeArea(
+      body: Container(
+                  decoration: BoxDecoration(
+                  image:DecorationImage(
+                      image: AssetImage('lib/images/background.png'),
+                      fit:BoxFit.cover,
+                    ),
+                  ), 
+
+      child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 25),
+                
             
                 // logo
-                const Icon(
-                  Icons.lock,
-                  size: 50,
-                ),
+                Positioned(
+                        
+                        
+                        child: Padding(
+                          padding: const EdgeInsets.all (6.0),
+                          child: Image.asset(
+                            'lib/images/logintaw.png',
+                            width :150, 
+                            height :150, 
+                  
+                          ),
+                        ),
+                  ),
             
-                const SizedBox(height: 25),
+                const SizedBox(height: 5),
             
                 // Le'ts create an acount for you 
                 Text(
@@ -107,12 +122,25 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
             
-                const SizedBox(height: 25),
-            
+                const SizedBox(height: 5),
                 // username textfield
                 MyTextField(
                   controller: emailController,
-                  hintText: 'Username',
+                  hintText: 'CIN',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 5),
+                // username textfield
+                MyTextField(
+                  controller: emailController,
+                  hintText: 'NumTelph',
+                  obscureText: false,
+                ),
+                const SizedBox(height: 5),
+                // username textfield
+                MyTextField(
+                  controller: emailController,
+                  hintText: 'Username@example.com',
                   obscureText: false,
                 ),
             
@@ -159,52 +187,14 @@ class _RegisterPageState extends State<RegisterPage> {
                   onTap: signUserUp,
                 ),
             
-                const SizedBox(height: 50),
+                
             
-                // or continue with
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: Text(
-                          'Or continue with',
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                      ),
-                      Expanded(
-                        child: Divider(
-                          thickness: 0.5,
-                          color: Colors.grey[400],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            
-                const SizedBox(height: 50),
+               
             
                 // google + apple sign in buttons
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children:  [
-                    // google button
-                    SquareTile(imagePath: 'lib/images/google.png'),
+                
             
-                    
-            
-                    
-                  ],
-                ),
-            
-                const SizedBox(height: 50),
+                const SizedBox(height: 20),
             
                 // not a member? register now
                 Row(
@@ -231,6 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

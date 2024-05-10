@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:tawhida_login/nav_bar.dart';
 // Glycemie page include an image, a title, a description, and extra content.
 class Spo2Page extends StatefulWidget  {
   const Spo2Page({super.key});
@@ -12,16 +12,18 @@ class _Spo2Pagestate extends State<Spo2Page> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      drawer: NavBar(),
       body: Container(
         decoration: BoxDecoration(
-          image:DecorationImage(
+          image:DecorationImage(  
             image: AssetImage('lib/images/background.png'),
             fit:BoxFit.cover,
           ),
         ),
         child: Stack(
           children: [
+           
+
             Positioned(
               top: 30,
               left:20, 
