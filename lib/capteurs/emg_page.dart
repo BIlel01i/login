@@ -1,10 +1,14 @@
-// ignore_for_file: library_private_types_in_public_api, avoid_print
+// ignore_for_file: library_private_types_in_public_api
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
+import 'package:tawhida_login/recupdata.dart'; // Make sure the path matches where you store your classes
+import 'package:tawhida_login/side_Nav/navigation.dart'; // Adjust this import based on your project structure
 
 class EmgPage extends StatefulWidget {
-  const EmgPage({super.key});
+  final String userId;
+  const EmgPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _EmgPageState createState() => _EmgPageState();
@@ -13,10 +17,15 @@ class EmgPage extends StatefulWidget {
 class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<int> _animation;
+  late RecupRealTimeData recupEMGData;
+  List<FlSpot> emgDataPoints = [];
+  double timeCounter = 0;
 
   @override
   void initState() {
     super.initState();
+    recupEMGData = RecupRealTimeData(userId: widget.userId, field: 'EMG');
+
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -139,8 +148,46 @@ class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
   }
 
   Widget landscapeLayout() {
-    return const Center(
-      child: Text("Landscape mode - Show real-time chart here"),
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: recupEMGData.stream,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData || snapshot.data?.data() == null) {
+          return const Center(child: Text("No EMG data available"));
+        }
+        var data = snapshot.data!.data()!;
+        var emgValue =
+            double.tryParse(data[recupEMGData.field].toString()) ?? 0.0;
+
+        if (emgDataPoints.length > 300) {
+          emgDataPoints.removeAt(0); // Keep the graph's data points limited
+        }
+        emgDataPoints.add(FlSpot(timeCounter++, emgValue));
+
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(show: false),
+              titlesData: FlTitlesData(show: false),
+              borderData: FlBorderData(show: true),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: emgDataPoints,
+                  isCurved: true,
+                  color: Colors.red,
+                  barWidth: 2,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(show: false),
+                  belowBarData: BarAreaData(show: false),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -162,12 +209,8 @@ class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildButton('Upload', Colors.blue, () {
-                print('Upload pressed');
-              }),
-              _buildButton('Archive', Colors.blue, () {
-                print('Archive pressed');
-              }),
+              _buildButton('Upload', Colors.blue, () {}),
+              _buildButton('Archive', Colors.blue, () {}),
             ],
           ),
         ),

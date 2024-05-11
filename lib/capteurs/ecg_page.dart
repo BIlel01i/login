@@ -1,33 +1,35 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tawhida_login/recupdata.dart';
-import 'package:tawhida_login/side_Nav/navigation.dart'; // Adjust according to your actual import path
+import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
 
 class EcgPage extends StatefulWidget {
+  const EcgPage({super.key, required this.userId});
   final String userId;
-  const EcgPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   _EcgPageState createState() => _EcgPageState();
 }
 
 class _EcgPageState extends State<EcgPage> with SingleTickerProviderStateMixin {
-  late RecupRealTimeData recupECGeData;
   late AnimationController _controller;
   late Animation<int> _animation;
-  late Stream<DocumentSnapshot<Map<String, dynamic>>> recupEcgData;
+  late RecupRealTimeData recupECGData;
+  List<FlSpot> emgDataPoints = [];
+  double timeCounter = 0;
 
   @override
   void initState() {
     super.initState();
-    recupECGeData = RecupRealTimeData(userId: widget.userId, field: 'ECG');
+
+    recupECGData = RecupRealTimeData(userId: widget.userId, field: 'ECG');
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
-    )..repeat(reverse: true);
+    )..repeat(reverse: true); // This makes the animation go back and forth
 
     _animation = IntTween(begin: 0, end: 1).animate(_controller)
       ..addListener(() {
@@ -44,7 +46,7 @@ class _EcgPageState extends State<EcgPage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(),
+      drawer: const NavBar(), // Your navigation drawer
       body: Stack(
         children: [
           Container(
@@ -147,85 +149,46 @@ class _EcgPageState extends State<EcgPage> with SingleTickerProviderStateMixin {
 
   Widget landscapeLayout() {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: recupEcgData,
+      stream: recupECGData.stream,
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          var ecgDataString = snapshot.data!.data()!['ecg'] as String;
-          List<String> ecgDataList = ecgDataString.split(',');
-          List<FlSpot> spots = [];
-          DateTime startTime =
-              DateTime.now().subtract(Duration(minutes: ecgDataList.length));
-
-          for (var i = 0; i < ecgDataList.length; i++) {
-            final ecgValue = double.parse(ecgDataList[i]);
-            final time = startTime.add(Duration(minutes: i));
-            spots.add(FlSpot(time.millisecondsSinceEpoch.toDouble(), ecgValue));
-          }
-
-          saveDataLocally(ecgDataString);
-
-          return Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('lib/images/bcgECG.jpg'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            child: Center(
-              child: LineChart(
-                LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 42,
-                        getTitlesWidget: (value, meta) {
-                          final DateTime date =
-                              DateTime.fromMillisecondsSinceEpoch(
-                                  value.toInt());
-                          return SideTitleWidget(
-                            child: Text(DateFormat('HH:mm').format(date),
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 10)),
-                            angle: -45,
-                            axisSide: AxisSide.bottom,
-                          );
-                        },
-                      ),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: spots,
-                      isCurved: true,
-                      color: Colors.blue,
-                      barWidth: 2,
-                      isStrokeCapRound: true,
-                      dotData: FlDotData(show: false),
-                      belowBarData: BarAreaData(show: false),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          return Text("Error: ${snapshot.error}");
-        } else {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
+        if (!snapshot.hasData || snapshot.data?.data() == null) {
+          return const Center(child: Text("No EMG data available"));
+        }
+        var data = snapshot.data!.data()!;
+        var emgValue =
+            double.tryParse(data[recupECGData.field].toString()) ?? 0.0;
+
+        if (emgDataPoints.length > 300) {
+          emgDataPoints.removeAt(0); // Keep the graph's data points limited
+        }
+        emgDataPoints.add(FlSpot(timeCounter++, emgValue));
+
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(show: true),
+              titlesData: FlTitlesData(show: false),
+              borderData: FlBorderData(show: true),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: emgDataPoints,
+                  isCurved: true,
+                  color: const Color.fromARGB(255, 255, 52, 37),
+                  barWidth: 2,
+                  isStrokeCapRound: true,
+                  dotData: FlDotData(show: false),
+                  belowBarData: BarAreaData(show: false),
+                ),
+              ],
+            ),
+          ),
+        );
       },
     );
-  }
-
-  void saveDataLocally(String data) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('ECGData', data);
   }
 
   Widget buttonsRow() {

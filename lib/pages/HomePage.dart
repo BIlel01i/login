@@ -227,7 +227,9 @@ class HomePage extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const EmgPage()));
+                                      builder: (context) => const EmgPage(
+                                          userId:
+                                              'XYeapz3yTfh4yet5tBGk35eneJm1')));
                             },
                             child: Container(
                               height: 116,
