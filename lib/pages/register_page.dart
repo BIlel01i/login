@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tawhida_login/components/my_button.dart';
@@ -38,6 +40,7 @@ class _RegisterPageState extends State<RegisterPage> {
         //show error message
         wrongPasswordMessage();
       }
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);

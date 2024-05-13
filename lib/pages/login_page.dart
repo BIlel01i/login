@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tawhida_login/components/my_button.dart';
@@ -32,8 +34,10 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text,
         password: passwordController.text,
       );
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
+      // ignore: use_build_context_synchronously
       Navigator.pop(context);
       //wrong email
       if (e.code == 'user-not-found') {

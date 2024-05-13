@@ -3,12 +3,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:tawhida_login/recupdata.dart'; // Make sure the path matches where you store your classes
+import 'package:tawhida_login/pages/recupdata.dart'; // Make sure the path matches where you store your classes
 import 'package:tawhida_login/side_Nav/navigation.dart'; // Adjust this import based on your project structure
 
 class EmgPage extends StatefulWidget {
   final String userId;
-  const EmgPage({Key? key, required this.userId}) : super(key: key);
+  const EmgPage({super.key, required this.userId});
 
   @override
   _EmgPageState createState() => _EmgPageState();

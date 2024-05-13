@@ -3,7 +3,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:tawhida_login/recupdata.dart';
+import 'package:tawhida_login/pages/recupdata.dart';
 import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
 
 class EcgPage extends StatefulWidget {
