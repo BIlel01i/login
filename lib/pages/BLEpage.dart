@@ -1,9 +1,14 @@
+// ignore_for_file: library_private_types_in_public_api, use_key_in_widget_constructors, file_names
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lottie/lottie.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import 'config_device.dart';
 
 void main() => runApp(MaterialApp(home: BLEPage()));
 
@@ -15,17 +20,26 @@ class BLEPage extends StatefulWidget {
 class _BLEPageState extends State<BLEPage> {
   final FlutterReactiveBle _ble = FlutterReactiveBle();
   StreamSubscription<DiscoveredDevice>? _scanSubscription;
-  List<DiscoveredDevice> _foundDevices = [];
-  Map<String, StreamSubscription<ConnectionStateUpdate>?>
+  final List<DiscoveredDevice> _foundDevices = [];
+  final Map<String, StreamSubscription<ConnectionStateUpdate>?>
       _connectionSubscriptions = {};
-  Map<String, bool> _deviceConnectionStates = {};
+  final Map<String, bool> _deviceConnectionStates = {};
 
   bool _isScanning = false;
+  bool _showAnimation = true;
 
   @override
   void initState() {
     super.initState();
     _requestPermissions();
+
+    // Show animation for 5 seconds
+    Timer(Duration(seconds: 5), () {
+      setState(() {
+        _showAnimation = false;
+      });
+      _startScan();
+    });
   }
 
   void _requestPermissions() async {
@@ -79,6 +93,13 @@ class _BLEPageState extends State<BLEPage> {
             _deviceConnectionStates[deviceId] = true;
           });
           _showToast("Connected to ${connectionState.deviceId}");
+
+          // After showing the toast, navigate to the ConfigDevice page
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => ConfigDevice(
+                    device: _foundDevices.firstWhere((d) => d.id == deviceId),
+                    ble: _ble,
+                  )));
         }
       },
       onError: (error) {
@@ -100,7 +121,7 @@ class _BLEPageState extends State<BLEPage> {
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 3,
+        timeInSecForIosWeb: 6,
         backgroundColor: Colors.black,
         textColor: Colors.white,
         fontSize: 16.0);
@@ -117,44 +138,61 @@ class _BLEPageState extends State<BLEPage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: Text('Flutter Reactive BLE Example'),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          ElevatedButton(
-            onPressed: _isScanning ? null : _startScan,
-            child: Text(_isScanning ? 'Scanning...' : 'Start Scanning'),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _foundDevices.length,
-              itemBuilder: (context, index) {
-                final device = _foundDevices[index];
-                return ListTile(
-                  title: Text(
-                      device.name.isEmpty ? "Unknown Device" : device.name),
-                  subtitle: Text(device.id),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (!_deviceConnectionStates[device.id]!)
-                        ElevatedButton(
-                          onPressed: () => _connectToDevice(device.id),
-                          child: Text('Connect'),
-                        ),
-                      if (_deviceConnectionStates[device.id]!)
-                        ElevatedButton(
-                          onPressed: () => _disconnectFromDevice(device.id),
-                          child: Text('Disconnect'),
-                        ),
-                    ],
+          _showAnimation
+              ? Center(
+                  child: Lottie.asset(
+                    'lib/animations/scanning_animation.json', // Path to your Lottie animation
+                    width: screenSize.width * 0.5,
+                    height: screenSize.height * 0.5,
                   ),
-                );
-              },
-            ),
-          ),
+                )
+              : Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: _isScanning ? null : _startScan,
+                      child:
+                          Text(_isScanning ? 'Scanning...' : 'Start Scanning'),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _foundDevices.length,
+                        itemBuilder: (context, index) {
+                          final device = _foundDevices[index];
+                          return ListTile(
+                            title: Text(device.name.isEmpty
+                                ? "Unknown Device"
+                                : device.name),
+                            subtitle: Text(device.id),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (!_deviceConnectionStates[device.id]!)
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        _connectToDevice(device.id),
+                                    child: Text('Connect'),
+                                  ),
+                                if (_deviceConnectionStates[device.id]!)
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        _disconnectFromDevice(device.id),
+                                    child: Text('Disconnect'),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
         ],
       ),
     );

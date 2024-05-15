@@ -1,16 +1,29 @@
 // ignore_for_file: avoid_print, library_private_types_in_public_api
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:tawhida_login/pages/recupdata.dart';
 import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
 
 class RythmePage extends StatefulWidget {
-  const RythmePage({super.key});
-
+  final String
+      userId; // This assumes you're passing the userId when creating the page.
+  // ignore: prefer_const_constructors_in_immutables
+  RythmePage({super.key, required this.userId});
   @override
   _RythmePageState createState() => _RythmePageState();
 }
 
 class _RythmePageState extends State<RythmePage> {
+  late RecupRealTimeData recupTemperatureData;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the recupTemperatureData with the specific field 'temperature'
+    recupTemperatureData =
+        RecupRealTimeData(userId: widget.userId, field: 'bpm');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,13 +88,45 @@ class _RythmePageState extends State<RythmePage> {
                         width: 180,
                         height: 180,
                       ),
-                      const Text(
-                        'BPM',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      StreamBuilder<DocumentSnapshot>(
+                        stream: recupTemperatureData.stream,
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.active) {
+                            if (snapshot.hasData &&
+                                snapshot.data!.data() != null) {
+                              var data =
+                                  snapshot.data!.data() as Map<String, dynamic>;
+                              var temperature = '${data['spo2']}BPM';
+                              return Text(
+                                temperature, // Display dynamic temperature data here
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return const Text(
+                                'Error',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              );
+                            }
+                          }
+                          // Default or loading state
+                          return Text(
+                            'Loading...',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),

@@ -1,151 +1,99 @@
-import 'dart:async';
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-void main() => runApp(MaterialApp(home: BLEPage()));
+class ConfigDevice extends StatefulWidget {
+  final DiscoveredDevice device;
+  final FlutterReactiveBle ble;
 
-class BLEPage extends StatefulWidget {
+  const ConfigDevice({super.key, required this.device, required this.ble});
+
   @override
-  _BLEPageState createState() => _BLEPageState();
+  // ignore: library_private_types_in_public_api
+  _ConfigDeviceState createState() => _ConfigDeviceState();
 }
 
-class _BLEPageState extends State<BLEPage> {
-  final FlutterReactiveBle _ble = FlutterReactiveBle();
-  List<DiscoveredDevice> _foundDevices = [];
-  DiscoveredDevice? _connectedDevice;
-  StreamSubscription<ConnectionStateUpdate>? _connectionSubscription;
-  StreamSubscription<DiscoveredDevice>? _scanSubscription;
-  bool _isScanning = false;
+class _ConfigDeviceState extends State<ConfigDevice> {
+  final TextEditingController _textController = TextEditingController();
+  QualifiedCharacteristic? _qualifiedCharacteristic;
+  bool _isSending = false;
 
   @override
   void initState() {
     super.initState();
-    _requestPermissions();
+    _discoverServices();
   }
 
-  void _requestPermissions() async {
-    await [
-      Permission.bluetoothScan,
-      Permission.bluetoothConnect,
-      Permission.location
-    ].request();
+  void _discoverServices() async {
+    // ignore: deprecated_member_use
+    final services = await widget.ble.discoverServices(widget.device.id);
+    for (var service in services) {
+      for (var characteristic in service.characteristics) {
+        if (characteristic.isWritableWithResponse ||
+            characteristic.isWritableWithoutResponse) {
+          setState(() {
+            _qualifiedCharacteristic = QualifiedCharacteristic(
+              serviceId: service.serviceId,
+              characteristicId: characteristic.characteristicId,
+              deviceId: widget.device.id,
+            );
+          });
+          break;
+        }
+      }
+      if (_qualifiedCharacteristic != null) break;
+    }
   }
 
-  void _startScan() {
-    setState(() {
-      _isScanning = true;
-      _foundDevices.clear();
-    });
-    _scanSubscription = _ble.scanForDevices(
-      withServices: [],
-      scanMode: ScanMode.lowLatency,
-    ).listen((device) {
-      if (!_foundDevices.any((element) => element.id == device.id)) {
+  void _sendData() async {
+    if (_textController.text.isNotEmpty && _qualifiedCharacteristic != null) {
+      setState(() {
+        _isSending = true;
+      });
+      try {
+        await widget.ble.writeCharacteristicWithResponse(
+          _qualifiedCharacteristic!,
+          value: _textController.text.codeUnits,
+        );
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Data sent successfully!")));
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Failed to send data: $e")));
+      } finally {
         setState(() {
-          _foundDevices.add(device);
+          _isSending = false;
         });
       }
-    }, onDone: _stopScan);
-  }
-
-  void _stopScan() {
-    _scanSubscription?.cancel();
-    setState(() {
-      _isScanning = false;
-    });
-  }
-
-  void _connectToDevice(String deviceId) {
-    if (_connectionSubscription != null) {
-      _connectionSubscription!.cancel();
     }
-    _connectionSubscription = _ble
-        .connectToDevice(
-      id: deviceId,
-      connectionTimeout: const Duration(seconds: 10),
-    )
-        .listen(
-      (connectionState) {
-        if (connectionState.connectionState ==
-            DeviceConnectionState.connected) {
-          setState(() {
-            _connectedDevice =
-                _foundDevices.firstWhere((device) => device.id == deviceId);
-          });
-        }
-      },
-      onError: (error) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Connection Error"),
-            content: Text("Failed to connect. Error: $error"),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text("OK"),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  void _disconnectFromDevice() {
-    _connectionSubscription?.cancel();
-    setState(() {
-      _connectedDevice = null;
-    });
-  }
-
-  @override
-  void dispose() {
-    _stopScan();
-    _disconnectFromDevice();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flutter Reactive BLE Example'),
+        title: Text('Configure Device - ${widget.device.name}'),
       ),
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: _isScanning ? null : _startScan,
-            child: Text(_isScanning ? 'Scanning...' : 'Start Scanning'),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _foundDevices.length,
-              itemBuilder: (context, index) {
-                final device = _foundDevices[index];
-                return ListTile(
-                  title: Text(
-                      device.name.isEmpty ? "Unknown Device" : device.name),
-                  subtitle: Text(device.id),
-                  trailing: ElevatedButton(
-                    onPressed: () => _connectToDevice(device.id),
-                    child: Text('Connect'),
-                  ),
-                );
-              },
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: <Widget>[
+            TextField(
+              controller: _textController,
+              decoration: InputDecoration(
+                labelText: 'Enter data to send',
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
-          if (_connectedDevice != null)
+            SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _disconnectFromDevice,
-              child:
-                  Text('Disconnect from ${_connectedDevice?.name ?? "Device"}'),
+              onPressed: _isSending ? null : _sendData,
+              child: Text(_isSending ? 'Sending...' : 'Set Configuration'),
             ),
-        ],
+          ],
+        ),
       ),
     );
   }

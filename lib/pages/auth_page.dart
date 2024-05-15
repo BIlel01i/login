@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tawhida_login/pages/config.dart';
+import 'package:tawhida_login/pages/BLEpage.dart';
 
 //import 'package:tawhida_login/pages/HomePage.dart';
 

@@ -1,17 +1,29 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, prefer_const_constructors_in_immutables
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:tawhida_login/pages/recupdata.dart';
 import 'package:tawhida_login/side_Nav/navigation.dart';
 
 class Spo2Page extends StatefulWidget {
-  const Spo2Page({super.key});
-
+  final String
+      userId; // This assumes you're passing the userId when creating the page.
+  Spo2Page({super.key, required this.userId});
   @override
   // ignore: library_private_types_in_public_api
   _Spo2PageState createState() => _Spo2PageState();
 }
 
 class _Spo2PageState extends State<Spo2Page> {
+  late RecupRealTimeData recupTemperatureData;
+  @override
+  void initState() {
+    super.initState();
+    // Initialize the recupTemperatureData with the specific field 'temperature'
+    recupTemperatureData =
+        RecupRealTimeData(userId: widget.userId, field: 'spo2');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,13 +81,45 @@ class _Spo2PageState extends State<Spo2Page> {
                       width: 200, // Responsive width
                       height: 200, // Responsive height
                     ),
-                    const Text(
-                      '%',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    StreamBuilder<DocumentSnapshot>(
+                      stream: recupTemperatureData.stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.active) {
+                          if (snapshot.hasData &&
+                              snapshot.data!.data() != null) {
+                            var data =
+                                snapshot.data!.data() as Map<String, dynamic>;
+                            var temperature = '${data['spo2']}%';
+                            return Text(
+                              temperature, // Display dynamic temperature data here
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          } else if (snapshot.hasError) {
+                            return const Text(
+                              'Error',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          }
+                        }
+                        // Default or loading state
+                        return Text(
+                          'Loading...',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

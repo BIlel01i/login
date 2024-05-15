@@ -84,7 +84,10 @@ class HomePage extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Spo2Page()));
+                                      builder: (context) => Spo2Page(
+                                            userId:
+                                                'XYeapz3yTfh4yet5tBGk35eneJm1',
+                                          )));
                             },
                             child: Container(
                               height: 116,
@@ -181,8 +184,10 @@ class HomePage extends StatelessWidget {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const RythmePage()));
+                                      builder: (context) => RythmePage(
+                                            userId:
+                                                'XYeapz3yTfh4yet5tBGk35eneJm1',
+                                          )));
                             },
                             child: Container(
                               height: 116,
