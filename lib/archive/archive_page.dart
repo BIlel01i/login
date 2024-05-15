@@ -1,23 +1,21 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tawhida_login/capteurs/ecg_page.dart';
-import 'package:tawhida_login/capteurs/emg_page.dart';
-import 'package:tawhida_login/capteurs/glycemie_page.dart';
-import 'package:tawhida_login/capteurs/rythme_page.dart';
-import 'package:tawhida_login/capteurs/spo2_page.dart';
-import 'package:tawhida_login/capteurs/temperture_page.dart';
-import 'package:tawhida_login/nav_bar.dart';
-class HomePage extends StatelessWidget {
-  final String userId;
-   const HomePage({super.key, required this.userId});
-  void signUserOut(){
-    FirebaseAuth.instance.signOut();
-  }
+import 'package:tawhida_login/archive/archive_ecg.dart';
+import 'package:tawhida_login/archive/archive_emg.dart';
+import 'package:tawhida_login/archive/archive_glycemie.dart';
+import 'package:tawhida_login/archive/archive_rythcar.dart';
+import 'package:tawhida_login/archive/archive_spo2.dart';
+import 'package:tawhida_login/nav_bar.dart'; // Ensure this is the correct import path for your NavBar
+
+import 'archive_temp.dart';
+class Archive extends StatelessWidget {
+     final String userId;
+
+  const Archive({super.key, required  this.userId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          drawer: NavBar(userId: userId),
+      drawer: NavBar(userId: userId),
           
           appBar: AppBar(
             
@@ -57,7 +55,7 @@ class HomePage extends StatelessWidget {
                       ),
                       const Center(
                         child: Text(
-                          'Bienvenue à TAWHIDA',
+                          'Archives TAWHIDA',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
@@ -75,9 +73,12 @@ class HomePage extends StatelessWidget {
                               InkWell(
                                 onTap: () {
                                   Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>  Spo2Page(userId: userId)));
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>  Archspo2()));
+                                  
+            
+                               
                                 },
                                 child: Container(
                                   height: 116,
@@ -118,10 +119,12 @@ class HomePage extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(
+                               Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                            builder: (context) => const EcgPage()));
+                                            builder: (context) =>  Archecg()));
+                                  
+            
                                   
                                 },
                                 child: Container(
@@ -169,10 +172,11 @@ class HomePage extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => const RythmePage()));
+                                  Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>  Archryth()));
+                                        
                                 },
                                 child: Container(
                                   height: 116,
@@ -215,10 +219,11 @@ class HomePage extends StatelessWidget {
                               InkWell(
                                 onTap: () 
                                   {
-                                     Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>  EmgPage(userId: userId)));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>  Archemg()));
+                                  
                                   },
                                 
                                 child: Container(
@@ -269,10 +274,11 @@ class HomePage extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => const GlycemiePage()));
+                                 Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>  Archglyc()));
+                                  
                                 },
                                 child: Container(
                                   height: 116,
@@ -314,9 +320,12 @@ class HomePage extends StatelessWidget {
                             children: [
                               InkWell(
                                 onTap: () {
-                                  Navigator.push(context,
-                                      MaterialPageRoute(builder: (context) =>  TemperaturePage (userId: userId ),
-                                      ));
+                                  Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>  Archtemp()));
+                                  
+                                  
                                 },
                                 child: Container(
                                   height: 116,

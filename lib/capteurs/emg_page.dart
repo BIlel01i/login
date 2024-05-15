@@ -1,156 +1,238 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-// Glycemie page include an image, a title, a description, and extra content.
-class EmgPage extends StatefulWidget  {
-  const EmgPage({super.key});
-
+import 'package:tawhida_login/firebase_service/recup_data.dart';
+import 'package:tawhida_login/nav_bar.dart'; // Ensure this is the correct import path for your NavBar
+class EmgPage extends StatefulWidget {
+   final String userId;
+  const EmgPage({super.key, required this.userId});
+  
   @override
-  _EmgPagestate createState() => _EmgPagestate();
+  _EmgPageState createState() => _EmgPageState();
 }
 
-class _EmgPagestate extends State<EmgPage> {
+class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<int> _animation;
+  late RecupRealTimeData recupEMGData;
+  @override
+  void initState() {
+    super.initState();
+    recupEMGData =
+        RecupRealTimeData(userId: widget.userId, field: 'EMG');
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true); // This makes the animation go back and forth
+
+    _animation = IntTween(begin: 0, end: 1).animate(_controller)
+      ..addListener(() {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
-      body: Container(
-        decoration: BoxDecoration(
-          image:DecorationImage(
-            image: AssetImage('lib/images/background.png'),
-            fit:BoxFit.cover,
-          ),
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              top: 30,
-              left:20, 
-              child: Padding(
-                padding: const EdgeInsets.all (8.0),
-                child: Image.asset(
-                  'lib/images/logotaw.png',
-                  width :130, 
-                  height :60, 
-        
-                ),
+      drawer:  NavBar(userId: widget.userId), // Your navigation drawer
+      body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('lib/images/background.png'),
+                fit: BoxFit.cover,
               ),
             ),
-            Positioned(
-              top: 120, // Adjust top position as needed
-              left: 30, // Adjust left position as needed
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'EMG',
-                    style: TextStyle(
-                      color: Colors.blue, // Change text color as needed
-                      fontSize: 25, // Adjust font size as needed
-                      fontWeight: FontWeight.bold, // Adjust font weight as needed
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Image.asset(
+                        "lib/images/logotaw.png",
+                        width: 100,
+                        height: 50,
+                        fit: BoxFit.cover,
+                      ),
                     ),
+                  ],
+                ),
+                Expanded(
+                  child: orientationLayout(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget orientationLayout() {
+    var orientation = MediaQuery.of(context).orientation;
+    return orientation == Orientation.portrait
+        ? portraitLayout()
+        : landscapeLayout();
+  }
+
+  Widget portraitLayout() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(left: 30, top: 40),
+                child: Text(
+                  'EMG',
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
                   ),
-                 
-                  
-                      
+                ),
+              ),
+              AnimatedBuilder(
+                animation: _animation,
+                builder: (_, __) => Image.asset(
+                  _animation.value == 0
+                      ? 'lib/images/icon1.png'
+                      : 'lib/images/icon2.png',
+                  width: 50,
+                  height: 50,
+                ),
+              ),
+            ],
+          ),
+          Stack(
+                alignment: Alignment.center, // Centers the text on the image
+                children: [
+                  Image.asset(
+                    'lib/images/temp3.png',
+                    width: 160,
+                    height: 150,
+                  ),
+                  StreamBuilder<DocumentSnapshot>(
+                    stream: recupEMGData.stream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.active) {
+                        if (snapshot.hasData && snapshot.data!.data() != null) {
+                          var data =
+                              snapshot.data!.data() as Map<String, dynamic>;
+                          var temperature =
+                              data['EMG'].toString() + ' Neu';
+                          return Text(
+                            temperature, // Display dynamic temperature data here
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return const Text(
+                            'Error',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          );
+                        }
+                      }
+                      // Default or loading state
+                      return Text(
+                        'Loading...',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
-            ),
-            
-            Positioned(
-                bottom: 10,
-                right: 20,
-                child: Image.asset(
-                  'lib/images/Mode_Isolation.png', // Replace with your image asset
-                  width: 100, // Adjust image width as needed
-                  height: 100, // Adjust image height as needed
-                ),
-            ),
-            Positioned(
-                top: 190,
-                left: 70,
-                child: Image.asset(
-                  'lib/images/emg1.png', // Replace with your image asset
-                  width: 170, // Adjust image width as needed
-                  height: 170, // Adjust image height as needed
-                ),
-            ),
-            Positioned(
-                bottom: 170,
-                left: 70 ,
-                child: Image.asset(
-                  'lib/images/spo2im2.png', // Replace with your image asset
-                  width: 180, // Adjust image width as needed
-                  height: 180, // Adjust image height as needed
-                ),
-            ),
-            
-            Positioned(
-              bottom:235,
-              left:100, 
-              child: Text(
-                'Video',
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Colors.black,
-                  fontSize: 40,
-                  
-                ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 100),
+              child: Image.asset(
+                'lib/images/emg1.png',
+                width: 150,
+                height: 150,
               ),
             ),
-            Positioned(
-            bottom: 150,
-            left: 35,
-            child: Row(
-              children: [
-                _buildButton( 'Start',Colors.blue,  () {
-                  // Add functionality for button 1
-                  print('start pressed');
-                }),
-                SizedBox(width: 20),
-                _buildButton( 'Reset',Colors.blue ,() {
-                  // Add functionality for button 2
-                  print('Reset pressed');
-                }),
-                
-               
-              ],
+          ),
+          buttonsRow(),
+          Center(
+            child: Image.asset(
+              'lib/images/Mode_Isolation.png',
+              width: 100,
+              height: 100,
             ),
           ),
-          Positioned(
-            bottom: 100,
-            left: 35,
-            child: Row(
-              children: [
-                _buildButton( 'Upload',Colors.blue,  () {
-                  // Add functionality for button 1
-                  print('Upload pressed');
-                }),
-                SizedBox(width: 20),
-                _buildButton( 'Archive',Colors.blue ,() {
-                  // Add functionality for button 2
-                  print('Archive pressed');
-                }),
-                
-               
-              ],
-            ),
-          ),
-          ],
-        
-        ),
+        ],
       ),
-      
     );
-
   }
-  Widget _buildButton(String text,Color color ,  VoidCallback onPressed) {
+
+  Widget landscapeLayout() {
+    return const Center(
+      child: Text("Landscape mode - Show real-time chart here"),
+    );
+  }
+
+  Widget buttonsRow() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('Start', Colors.blue, () {}),
+              _buildButton('Reset', Colors.blue, () {}),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildButton('Upload', Colors.blue, () {
+                print('Upload pressed');
+              }),
+              _buildButton('Archive', Colors.blue, () {
+                print('Archive pressed');
+              }),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButton(String text, Color color, VoidCallback onPressed) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: color, 
-        minimumSize: Size(120, 40),// Set button color
+        backgroundColor: color,
+        minimumSize: const Size(120, 40),
       ),
-      
       child: Text(text),
     );
   }

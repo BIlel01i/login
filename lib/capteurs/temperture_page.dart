@@ -29,7 +29,7 @@ class _TemperaturePageState extends State<TemperaturePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer:  NavBar(userId: widget.userId), // Your navigation drawer
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
