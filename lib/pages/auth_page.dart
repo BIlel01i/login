@@ -1,9 +1,8 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:tawhida_login/pages/BLEpage.dart';
-
-//import 'package:tawhida_login/pages/HomePage.dart';
-
+import 'package:tawhida_login/pages/HomePage.dart';
 import 'login_or_register_page.dart';
 
 class AuthPage extends StatelessWidget {
@@ -17,7 +16,10 @@ class AuthPage extends StatelessWidget {
         builder: (context, snapshot) {
           // user is logged in
           if (snapshot.hasData) {
-            return BLEPage();
+            final user = snapshot.data!;
+            return HomePage(
+              fromLoginPage: true,
+            );
           }
 
           //user is not logged in

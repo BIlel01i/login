@@ -4,11 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:tawhida_login/pages/recupdata.dart';
-import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
+import 'package:tawhida_login/side_nav/navigation.dart';
 
 class EcgPage extends StatefulWidget {
-  const EcgPage({super.key, required this.userId});
-  final String userId;
+  const EcgPage(String userId, {super.key});
 
   @override
   _EcgPageState createState() => _EcgPageState();
@@ -25,11 +24,11 @@ class _EcgPageState extends State<EcgPage> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    recupECGData = RecupRealTimeData(userId: widget.userId, field: 'ECG');
+    recupECGData = RecupRealTimeData(field: 'ECG');
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
-    )..repeat(reverse: true); // This makes the animation go back and forth
+    )..repeat(reverse: true);
 
     _animation = IntTween(begin: 0, end: 1).animate(_controller)
       ..addListener(() {
@@ -46,7 +45,7 @@ class _EcgPageState extends State<EcgPage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer: NavBar(),
       body: Stack(
         children: [
           Container(
@@ -155,16 +154,15 @@ class _EcgPageState extends State<EcgPage> with SingleTickerProviderStateMixin {
           return const Center(child: CircularProgressIndicator());
         }
         if (!snapshot.hasData || snapshot.data?.data() == null) {
-          return const Center(child: Text("No EMG data available"));
+          return const Center(child: Text("No ECG data available"));
         }
         var data = snapshot.data!.data()!;
-        var emgValue =
-            double.tryParse(data[recupECGData.field].toString()) ?? 0.0;
+        var ecgValue = double.tryParse(data['ECG'].toString()) ?? 0.0;
 
         if (emgDataPoints.length > 300) {
-          emgDataPoints.removeAt(0); // Keep the graph's data points limited
+          emgDataPoints.removeAt(0);
         }
-        emgDataPoints.add(FlSpot(timeCounter++, emgValue));
+        emgDataPoints.add(FlSpot(timeCounter++, ecgValue));
 
         return Padding(
           padding: const EdgeInsets.all(8.0),

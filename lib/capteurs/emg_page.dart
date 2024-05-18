@@ -7,8 +7,7 @@ import 'package:tawhida_login/pages/recupdata.dart'; // Make sure the path match
 import 'package:tawhida_login/side_Nav/navigation.dart'; // Adjust this import based on your project structure
 
 class EmgPage extends StatefulWidget {
-  final String userId;
-  const EmgPage({super.key, required this.userId});
+  const EmgPage(String userId, {super.key});
 
   @override
   _EmgPageState createState() => _EmgPageState();
@@ -24,7 +23,7 @@ class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    recupEMGData = RecupRealTimeData(userId: widget.userId, field: 'EMG');
+    recupEMGData = RecupRealTimeData(field: 'EMG');
 
     _controller = AnimationController(
       duration: const Duration(seconds: 2),
@@ -46,7 +45,7 @@ class _EmgPageState extends State<EmgPage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer: NavBar(), // Your navigation drawer
       body: Stack(
         children: [
           Container(

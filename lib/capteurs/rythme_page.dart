@@ -6,10 +6,7 @@ import 'package:tawhida_login/pages/recupdata.dart';
 import 'package:tawhida_login/side_Nav/navigation.dart'; // Ensure this is the correct import path for your NavBar
 
 class RythmePage extends StatefulWidget {
-  final String
-      userId; // This assumes you're passing the userId when creating the page.
-  // ignore: prefer_const_constructors_in_immutables
-  RythmePage({super.key, required this.userId});
+  const RythmePage(String userId, {super.key});
   @override
   _RythmePageState createState() => _RythmePageState();
 }
@@ -20,14 +17,13 @@ class _RythmePageState extends State<RythmePage> {
   void initState() {
     super.initState();
     // Initialize the recupTemperatureData with the specific field 'temperature'
-    recupTemperatureData =
-        RecupRealTimeData(userId: widget.userId, field: 'bpm');
+    recupTemperatureData = RecupRealTimeData(field: 'bpm');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer: NavBar(), // Your navigation drawer
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -97,7 +93,7 @@ class _RythmePageState extends State<RythmePage> {
                                 snapshot.data!.data() != null) {
                               var data =
                                   snapshot.data!.data() as Map<String, dynamic>;
-                              var temperature = '${data['spo2']}BPM';
+                              var temperature = '${data['bpm']}BPM';
                               return Text(
                                 temperature, // Display dynamic temperature data here
                                 style: TextStyle(

@@ -23,14 +23,13 @@ class _GlycemiePageState extends State<GlycemiePage> {
   void initState() {
     super.initState();
     // Initialize the recupTemperatureData with the specific field 'temperature'
-    recupTemperatureData =
-        RecupRealTimeData(userId: widget.userId, field: 'glycemie');
+    recupTemperatureData = RecupRealTimeData(field: 'glycemie');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer: NavBar(), // Your navigation drawer
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

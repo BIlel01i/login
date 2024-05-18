@@ -6,9 +6,7 @@ import 'package:tawhida_login/pages/recupdata.dart';
 import 'package:tawhida_login/side_Nav/navigation.dart';
 
 class TemperaturePage extends StatefulWidget {
-  final String
-      userId; // This assumes you're passing the userId when creating the page.
-  TemperaturePage({super.key, required this.userId});
+  const TemperaturePage(String userId, {super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -22,14 +20,13 @@ class _TemperaturePageState extends State<TemperaturePage> {
   void initState() {
     super.initState();
     // Initialize the recupTemperatureData with the specific field 'temperature'
-    recupTemperatureData =
-        RecupRealTimeData(userId: widget.userId, field: 'temperature');
+    recupTemperatureData = RecupRealTimeData(field: 'temperature');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer: NavBar(), // Your navigation drawer
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,

@@ -6,9 +6,7 @@ import 'package:tawhida_login/pages/recupdata.dart';
 import 'package:tawhida_login/side_Nav/navigation.dart';
 
 class Spo2Page extends StatefulWidget {
-  final String
-      userId; // This assumes you're passing the userId when creating the page.
-  Spo2Page({super.key, required this.userId});
+  const Spo2Page(String userId, {super.key});
   @override
   // ignore: library_private_types_in_public_api
   _Spo2PageState createState() => _Spo2PageState();
@@ -20,14 +18,13 @@ class _Spo2PageState extends State<Spo2Page> {
   void initState() {
     super.initState();
     // Initialize the recupTemperatureData with the specific field 'temperature'
-    recupTemperatureData =
-        RecupRealTimeData(userId: widget.userId, field: 'spo2');
+    recupTemperatureData = RecupRealTimeData(field: 'spo2');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavBar(), // Your navigation drawer
+      drawer: NavBar(), // Your navigation drawer
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -90,9 +87,9 @@ class _Spo2PageState extends State<Spo2Page> {
                               snapshot.data!.data() != null) {
                             var data =
                                 snapshot.data!.data() as Map<String, dynamic>;
-                            var temperature = '${data['spo2']}%';
+                            var spo2 = '${data['spo2']}%';
                             return Text(
-                              temperature, // Display dynamic temperature data here
+                              spo2, // Display dynamic temperature data here
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,

@@ -141,9 +141,12 @@ class _ConfigDeviceState extends State<ConfigDevice> {
                       ElevatedButton(
                         onPressed: () {
                           // Use Navigator to push HomePage
-                          Navigator.push(
+                          Navigator.pushReplacement(
                             context,
-                            MaterialPageRoute(builder: (context) => HomePage()),
+                            MaterialPageRoute(
+                                builder: (context) => HomePage(
+                                      fromLoginPage: true,
+                                    )),
                           );
                         },
                         child: Text('Go to Home Page'),

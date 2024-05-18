@@ -1,11 +1,14 @@
-// ignore_for_file: avoid_returning_null_for_void, prefer_const_constructors
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:tawhida_login/pages/BLEpage.dart';
 import 'package:tawhida_login/pages/HomePage.dart';
+import 'package:tawhida_login/pages/archive.dart';
 
 class NavBar extends StatelessWidget {
-  const NavBar({super.key});
+  final String userId =
+      FirebaseAuth.instance.currentUser?.uid ?? 'defaultUserId';
+  NavBar({super.key});
   void signUserOut() {
     FirebaseAuth.instance.signOut();
   }
@@ -17,17 +20,49 @@ class NavBar extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: const Text("imen"),
-            accountEmail: const Text("imen.ayari@gmail.com"),
+            accountName: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .doc(userId) // Assuming you have the userId available
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Text("Loading...");
+                } else if (snapshot.hasData && snapshot.data!.exists) {
+                  var data = snapshot.data!.data()!;
+                  var name = data['name'] ?? "No name";
+                  return Text(name.toString());
+                } else {
+                  return Text("No user");
+                }
+              },
+            ),
+            accountEmail: StreamBuilder<User?>(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Text("Loading...");
+                } else if (snapshot.hasData) {
+                  return Text(snapshot.data!.email ?? "No email");
+                } else {
+                  return Text("No user");
+                }
+              },
+            ),
             currentAccountPicture: CircleAvatar(
-                child: ClipOval(
-              child: Image.asset("lib/images/profile.jpg",
-                  width: 90, height: 90, fit: BoxFit.cover),
-            )),
+              child: ClipOval(
+                child: Image.asset(
+                  "lib/images/logotaw.png",
+                  width: 90,
+                  height: 90,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
             decoration: const BoxDecoration(
               color: Color.fromARGB(8, 210, 225, 1),
               image: DecorationImage(
-                image: AssetImage('lib/images/bcg.jpg'),
+                image: AssetImage('lib/images/GLC.png'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -35,21 +70,24 @@ class NavBar extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.account_circle, color: Colors.black26),
             title: Text("Profile"),
-            onTap: () => null,
+            onTap: () {},
           ),
           ListTile(
             leading: Icon(Icons.home_filled, color: Colors.black26),
             title: Text("Home"),
             onTap: () {
-              Navigator.pop(context); // Fermez le tiroir avant de naviguer
-              Navigator.pushReplacement(
-                  context, MaterialPageRoute(builder: (context) => HomePage()));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomePage(
+                            fromLoginPage: false,
+                          )));
             },
           ),
           ListTile(
             leading: Icon(Icons.notifications_sharp, color: Colors.black26),
             title: Text("Notifications"),
-            onTap: () => null,
+            onTap: () {},
           ),
           ListTile(
             leading: Icon(
@@ -57,15 +95,23 @@ class NavBar extends StatelessWidget {
               color: Colors.black26,
             ),
             title: Text("Archive DMI"),
-            onTap: () => null,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => archive_Page(userId: userId)));
+            },
           ),
           ListTile(
             leading: Icon(
               Icons.settings,
               color: Colors.black26,
             ),
-            title: Text("Paramétre"),
-            onTap: () => null,
+            title: Text("Configure Device "),
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => BLEPage()));
+            },
           ),
           ListTile(
             leading: Icon(
@@ -73,7 +119,7 @@ class NavBar extends StatelessWidget {
               color: Colors.black26,
             ),
             title: Text("Calendrier"),
-            onTap: () => null,
+            onTap: () {},
           ),
           Divider(),
           ListTile(
